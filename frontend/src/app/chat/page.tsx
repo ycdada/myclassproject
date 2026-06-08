@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSSE } from "@/lib/useSSE";
 import type { SSEEvent } from "@/lib/useSSE";
+import { getMockChatScript, isDemoMode } from "@/lib/mockData";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -10,47 +11,101 @@ interface Message {
   agent?: string;
 }
 
+const INITIAL_MESSAGE: Message = {
+  role: "assistant",
+  content:
+    "你好！我是你的AI学习助手。让我们通过对话来了解你的学习情况，为你构建个性化的学习画像。首先，请告诉我：你之前学过哪些编程或数据结构相关的课程呢？",
+};
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content:
-        "你好！我是你的AI学习助手。让我们通过对话来了解你的学习情况，为你构建个性化的学习画像。首先，请告诉我：你之前学过哪些编程或数据结构相关的课程呢？",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [chatRound, setChatRound] = useState(0);
+  const [useMockFallback, setUseMockFallback] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSSEMessage = (event: SSEEvent) => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  // SSE handler — fixed to handle content_chunk (what backend actually sends)
+  const handleSSEMessage = useCallback((event: SSEEvent) => {
     switch (event.event) {
-      case "agent_thinking":
-        // Show agent thinking status
+      case "content_chunk":
+        setStreamingText((prev) => {
+          const text = event.data?.text || "";
+          return prev + text;
+        });
         break;
-      case "message":
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: event.data.content, agent: event.data.agent },
-        ]);
+      case "agent_thinking":
+        // Show agent thinking status in console for debugging
         break;
       case "profile_update":
-        // Profile dimension updated
+        // Profile dimension extracted
+        if (event.data?.profile) {
+          console.log("[Chat] Profile updated:", event.data.profile);
+        }
+        break;
+      case "error":
+        setIsStreaming(false);
+        setStreamingText("");
+        setMessages((prev) => [
+          ...prev,
+          { role: "system", content: `⚠️ ${event.data?.message || "连接失败，已切换到演示模式。"}` },
+        ]);
+        setUseMockFallback(true);
         break;
       case "done":
+        // Flush streaming text to messages
+        setStreamingText((currentText) => {
+          if (currentText) {
+            setMessages((prev) => [...prev, { role: "assistant", content: currentText, agent: "DSALearn AI" }]);
+          }
+          return "";
+        });
         setIsStreaming(false);
         break;
     }
-  };
+  }, []);
 
   const { connect } = useSSE("/api/chat/profile", {
     onMessage: handleSSEMessage,
-    onComplete: () => setIsStreaming(false),
-    onError: () => setIsStreaming(false),
+    onComplete: () => {
+      setIsStreaming(false);
+      setStreamingText("");
+    },
+    onError: () => {
+      setIsStreaming(false);
+      setStreamingText("");
+      setUseMockFallback(true);
+    },
   });
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    scrollToBottom();
+  }, [messages, streamingText, scrollToBottom]);
+
+  // Mock chat fallback
+  const runMockChat = useCallback(
+    (userMessage: string) => {
+      const scripts = getMockChatScript();
+      const round = Math.min(chatRound, scripts.length - 1);
+      const script = scripts[round];
+
+      // Simulate typing delay then add response
+      setTimeout(() => {
+        setMessages((prev) => [...prev, { role: "assistant", content: script.assistant, agent: "DSALearn AI" }]);
+        setIsStreaming(false);
+        // Skip first match (greeting), match subsequent ones
+        if (userMessage.length > 2) {
+          setChatRound((r) => Math.min(r + 1, scripts.length - 1));
+        }
+      }, 800 + Math.random() * 1200);
+    },
+    [chatRound]
+  );
 
   const handleSend = () => {
     if (!input.trim() || isStreaming) return;
@@ -58,7 +113,13 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setInput("");
     setIsStreaming(true);
-    connect({ content: userMessage });
+    setStreamingText("");
+
+    if (isDemoMode() || useMockFallback) {
+      runMockChat(userMessage);
+    } else {
+      connect({ content: userMessage });
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -75,6 +136,11 @@ export default function ChatPage() {
         <p className="text-gray-600 mt-1">
           通过与AI助手对话，系统将自动构建你的学习画像，并为你提供个性化学习建议。
         </p>
+        {(isDemoMode() || useMockFallback) && (
+          <div className="mt-2 px-3 py-1.5 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded-lg text-sm inline-block">
+            🎭 演示模式 — 使用预置对话脚本
+          </div>
+        )}
       </div>
 
       {/* Messages Area */}
@@ -102,7 +168,15 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
-        {isStreaming && (
+        {streamingText && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] bg-gray-100 rounded-xl px-4 py-3">
+              <p className="text-sm whitespace-pre-wrap">{streamingText}</p>
+              <span className="inline-block w-1.5 h-4 bg-gray-400 animate-pulse ml-0.5" />
+            </div>
+          </div>
+        )}
+        {isStreaming && !streamingText && (
           <div className="flex justify-start">
             <div className="bg-gray-100 rounded-xl px-4 py-3">
               <div className="flex items-center gap-2">
