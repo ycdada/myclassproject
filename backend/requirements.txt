@@ -35,9 +35,13 @@ pydantic-settings==2.5.0
 # MinIO
 minio==7.2.7
 
+# Embedding & RAG
+sentence-transformers>=2.5.0
+
 # Utilities
 python-dotenv==1.0.1
 tenacity==8.5.0
+aiofiles==24.1.0
 
 # Testing
 pytest==8.3.0

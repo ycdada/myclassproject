@@ -39,9 +39,12 @@ class Settings(BaseSettings):
     SPARK_ASR_APP_ID: str = ""
 
     # RAG
-    EMBEDDING_MODEL: str = "text2vec-large-chinese"
-    VECTOR_DIMENSION: int = 1024
-    RAG_SIMILARITY_THRESHOLD: float = 0.75
+    EMBEDDING_MODEL: str = "paraphrase-multilingual-MiniLM-L12-v2"
+    VECTOR_DIMENSION: int = 384
+    RAG_SIMILARITY_THRESHOLD: float = 0.65
+    RAG_CHUNK_SIZE: int = 800
+    RAG_CHUNK_OVERLAP: int = 100
+    RAG_TOP_K: int = 5
 
     # Content Safety
     ENABLE_SAFETY_FILTER: bool = True

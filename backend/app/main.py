@@ -12,6 +12,26 @@ async def lifespan(app: FastAPI):
     # Startup
     from app.models.base import init_db
     await init_db()
+
+    # Auto-seed database if empty
+    from sqlalchemy import text, select
+    from app.models.base import async_session
+    from app.models.resource import DSATopic
+
+    async with async_session() as session:
+        result = await session.execute(select(DSATopic).limit(1))
+        if not result.scalars().first():
+            from app.scripts.seed_db import seed_all
+            await seed_all()
+
+    # Pre-load embedding model
+    try:
+        from app.services.rag_service import get_rag_service
+        rag = await get_rag_service()
+        await rag.embed_query("warmup")
+    except Exception:
+        pass  # Model will load on first use
+
     yield
     # Shutdown
     pass

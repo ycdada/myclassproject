@@ -32,6 +32,7 @@ class SparkClient:
     """WebSocket-based client for iFlytek Spark API."""
 
     BASE_URL = "wss://spark-api.xf-yun.com"
+    _semaphore = asyncio.Semaphore(5)  # Limit concurrent WebSocket connections
 
     DOMAIN_URLS = {
         "generalv3.5": f"{BASE_URL}/v3.5/chat",       # Spark Pro
@@ -117,47 +118,48 @@ class SparkClient:
         max_tokens: int = 4096,
         functions: Optional[List[Dict]] = None,
     ) -> AsyncGenerator[str, None]:
-        """Stream chat completion via WebSocket."""
+        """Stream chat completion via WebSocket (connection-limited)."""
         url = self._build_auth_url()
         payload = self._build_payload(messages, temperature, max_tokens, functions)
 
-        try:
-            async with websockets.connect(url, ping_interval=30) as ws:
-                await ws.send(json.dumps(payload))
+        async with self._semaphore:  # Limit concurrent connections
+            try:
+                async with websockets.connect(url, ping_interval=30) as ws:
+                    await ws.send(json.dumps(payload))
 
-                while True:
-                    response = await ws.recv()
-                    data = json.loads(response)
+                    while True:
+                        response = await ws.recv()
+                        data = json.loads(response)
 
-                    header = data.get("header", {})
-                    code = header.get("code", 0)
+                        header = data.get("header", {})
+                        code = header.get("code", 0)
 
-                    if code != 0:
-                        logger.error(f"Spark API error: code={code}, message={header.get('message')}")
-                        yield f"[ERROR] API error code {code}: {header.get('message')}"
-                        break
+                        if code != 0:
+                            logger.error(f"Spark API error: code={code}, message={header.get('message')}")
+                            yield f"[ERROR] API error code {code}: {header.get('message')}"
+                            break
 
-                    payload_data = data.get("payload", {})
-                    choices = payload_data.get("choices", {})
-                    status = choices.get("status", 2)
+                        payload_data = data.get("payload", {})
+                        choices = payload_data.get("choices", {})
+                        status = choices.get("status", 2)
 
-                    text_list = choices.get("text", [])
-                    for text_item in text_list:
-                        content = text_item.get("content", "")
-                        if content:
-                            yield content
+                        text_list = choices.get("text", [])
+                        for text_item in text_list:
+                            content = text_item.get("content", "")
+                            if content:
+                                yield content
 
-                    # Also check for function call response
-                    if "function_call" in choices:
-                        func_call = choices["function_call"]
-                        yield json.dumps({"function_call": func_call})
+                        # Also check for function call response
+                        if "function_call" in choices:
+                            func_call = choices["function_call"]
+                            yield json.dumps({"function_call": func_call})
 
-                    if status == 2:  # Completed
-                        break
+                        if status == 2:  # Completed
+                            break
 
-        except Exception as e:
-            logger.error(f"Spark WebSocket error: {e}")
-            yield f"[ERROR] Connection failed: {str(e)}"
+            except Exception as e:
+                logger.error(f"Spark WebSocket error: {e}")
+                yield f"[ERROR] Connection failed: {str(e)}"
 
     async def chat(
         self,
