@@ -60,4 +60,4 @@ class Conversation(Base, TimestampMixin):
     role = Column(String(20), nullable=False)  # user/assistant/agent/system
     content = Column(Text, nullable=False)
     content_type = Column(String(30), default="text")  # text/image/audio/code/diagram
-    metadata = Column(JSONB, default=dict)  # {intent, extracted_entities, agent_name}
+    extra_meta = Column("metadata", JSONB, default=dict)  # {intent, extracted_entities, agent_name}

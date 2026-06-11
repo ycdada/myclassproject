@@ -1,5 +1,8 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -55,9 +58,11 @@ class Settings(BaseSettings):
     TEMPERATURE_FACTUAL: float = 0.3
     TEMPERATURE_CREATIVE: float = 0.7
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = {
+        "env_file": str(_PROJECT_ROOT / ".env"),
+        "case_sensitive": True,
+        "extra": "ignore",
+    }
 
 
 @lru_cache()

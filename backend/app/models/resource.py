@@ -34,7 +34,7 @@ class Resource(Base, TimestampMixin):
     resource_type = Column(String(50), nullable=False)  # lecture/mindmap/exercise/reading/video/code
     title = Column(String(300), nullable=False)
     content = Column(Text, nullable=True)
-    metadata = Column(JSONB, default=dict)
+    meta = Column(JSONB, default=dict)
     files = Column(JSONB, default=list)
 
     quality_score = Column(Float, nullable=True)

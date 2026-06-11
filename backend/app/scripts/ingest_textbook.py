@@ -149,9 +149,9 @@ async def ingest_all():
     rag = await get_rag_service()
 
     # Clear existing documents
-    from app.models.base import async_session
+    from app.models.base import _get_async_session
     from sqlalchemy import text
-    async with async_session() as session:
+    async with _get_async_session()() as session:
         await session.execute(text("DELETE FROM knowledge_documents"))
         await session.commit()
     print("[ingest] Cleared existing documents.")

@@ -326,8 +326,8 @@ async def content_generator_node(state: AgentState) -> AgentState:
     # Build personalization instructions
     cognitive_style = profile.get("cognitive_style", "visual")
     style_instructions = {
-        "visual": "多使用图表描述和空间类比，用文字描述可视化效果。多使用"例如"和场景化描述。",
-        "auditory": "使用节奏感和口语化解释，多用"首先...然后...最后"的叙述方式。",
+        "visual": "多使用「例如」和场景化描述。多使用图表描述和空间类比，用文字描述可视化效果。",
+        "auditory": "使用节奏感和口语化解释，多用「首先...然后...最后」的叙述方式。",
         "kinesthetic": "多提供动手练习建议和交互式思考题，强调实际操作步骤。",
         "reading": "提供详细的理论推导和严谨的文字描述，包含定义、定理、证明。",
     }.get(cognitive_style, "使用平衡的教学风格，结合图文并茂的讲解方式。")

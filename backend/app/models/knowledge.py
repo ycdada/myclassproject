@@ -25,7 +25,7 @@ class KnowledgeDocument(Base, TimestampMixin):
     chunk_index = Column(Integer, nullable=False)
     source_file = Column(String(255), nullable=False)
     content_type = Column(String(50), default="text")  # text / code / formula / definition
-    metadata = Column(JSONB, default=dict)             # {section, subsection, keywords}
+    meta = Column(JSONB, default=dict)  # {section, subsection, keywords}
     embedding = Column(Vector(settings.VECTOR_DIMENSION), nullable=False)
 
     __table_args__ = (

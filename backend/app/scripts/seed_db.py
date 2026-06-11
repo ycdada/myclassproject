@@ -10,7 +10,7 @@ import asyncio
 from passlib.context import CryptContext
 from sqlalchemy import text, select
 
-from app.models.base import async_session
+from app.models.base import _get_async_session
 from app.models.resource import DSATopic
 from app.models.student import Student, StudentProfile
 
@@ -47,7 +47,7 @@ async def seed_dsa_topics():
     """Seed DSA topics from knowledge graph seed data."""
     from app.knowledge_graph.seed_data import DSA_TOPICS
 
-    async with async_session() as session:
+    async with _get_async_session()() as session:
         # Check if already seeded
         result = await session.execute(select(DSATopic).limit(1))
         if result.scalars().first():
@@ -73,7 +73,7 @@ async def seed_dsa_topics():
 
 async def seed_demo_student():
     """Create a demo student account for testing."""
-    async with async_session() as session:
+    async with _get_async_session()() as session:
         result = await session.execute(
             select(Student).where(Student.username == DEMO_STUDENT["username"])
         )

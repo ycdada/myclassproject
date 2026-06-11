@@ -9,32 +9,25 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
-    from app.models.base import init_db
-    await init_db()
-
-    # Auto-seed database if empty
-    from sqlalchemy import text, select
-    from app.models.base import async_session
-    from app.models.resource import DSATopic
-
-    async with async_session() as session:
-        result = await session.execute(select(DSATopic).limit(1))
-        if not result.scalars().first():
-            from app.scripts.seed_db import seed_all
-            await seed_all()
-
-    # Pre-load embedding model
+    # Startup — DB init is optional (won't block server start)
     try:
-        from app.services.rag_service import get_rag_service
-        rag = await get_rag_service()
-        await rag.embed_query("warmup")
-    except Exception:
-        pass  # Model will load on first use
+        from app.models.base import init_db
+        await init_db()
+
+        from app.models.base import _get_async_session
+        from sqlalchemy import select
+        from app.models.resource import DSATopic
+
+        async with _get_async_session()() as session:
+            result = await session.execute(select(DSATopic).limit(1))
+            if not result.scalars().first():
+                from app.scripts.seed_db import seed_all
+                await seed_all()
+        print("[startup] Database initialized and seeded.")
+    except Exception as e:
+        print(f"[startup] Database unavailable — running without persistence: {e}")
 
     yield
-    # Shutdown
-    pass
 
 
 app = FastAPI(

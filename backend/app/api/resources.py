@@ -62,7 +62,8 @@ async def resource_generation_stream(request: ResourceGenerateRequest) -> AsyncG
         # Emit generated resources
         for i, res in enumerate(result.get("generated_resources", [])):
             progress = 0.3 + 0.6 * (i + 1) / max(len(result.get("generated_resources", [])), 1)
-            yield f"event: progress\ndata: {json.dumps({'step': f'Generated: {res.get(\"type\")}', 'progress': round(progress, 2), 'agent': 'Orchestrator'})}\n\n"
+            res_type = res.get("type", "unknown")
+            yield f"event: progress\ndata: {json.dumps({'step': f'Generated: {res_type}', 'progress': round(progress, 2), 'agent': 'Orchestrator'})}\n\n"
 
             # Stream content chunks for lecture type
             if res.get("type") == "lecture" and res.get("content"):
@@ -122,7 +123,7 @@ async def get_resource(
         "resource_type": resource.resource_type,
         "title": resource.title,
         "content": resource.content,
-        "metadata": resource.metadata or {},
+        "metadata": resource.meta or {},
     }
 
 

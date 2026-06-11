@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from sqlalchemy import text
 
 from app.config import get_settings
-from app.models.base import async_session
+from app.models.base import _get_async_session
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -128,7 +128,7 @@ class RAGService:
             LIMIT :top_k
         """)
 
-        async with async_session() as session:
+        async with _get_async_session()() as session:
             result = await session.execute(stmt, params)
             rows = result.fetchall()
 
@@ -137,7 +137,7 @@ class RAGService:
             docs.append(RetrievedDocument(
                 id=str(row.id),
                 content=row.content,
-                metadata=dict(row.metadata) if row.metadata else {},
+                metadata=dict(row.meta) if row.meta else {},
                 similarity_score=round(float(row.similarity), 4),
             ))
 
@@ -191,7 +191,7 @@ class RAGService:
             VALUES (:id, :topic_id, :content, :chunk_index, :source_file, :content_type, :metadata, :embedding)
         """)
 
-        async with async_session() as session:
+        async with _get_async_session()() as session:
             await session.execute(stmt, {
                 "id": doc_id or str(uuid.uuid4()),
                 "topic_id": metadata.get("topic_id"),
@@ -218,7 +218,7 @@ class RAGService:
             VALUES (:id, :topic_id, :content, :chunk_index, :source_file, :content_type, :metadata, :embedding)
         """)
 
-        async with async_session() as session:
+        async with _get_async_session()() as session:
             for doc, emb in zip(documents, embeddings):
                 await session.execute(stmt, {
                     "id": str(uuid.uuid4()),
@@ -236,7 +236,7 @@ class RAGService:
 
     async def delete_document(self, doc_id: str):
         """Remove a document from the knowledge base."""
-        async with async_session() as session:
+        async with _get_async_session()() as session:
             await session.execute(
                 text("DELETE FROM knowledge_documents WHERE id = :id"),
                 {"id": doc_id}
@@ -246,7 +246,7 @@ class RAGService:
 
     async def get_document_count(self) -> int:
         """Get total number of indexed documents."""
-        async with async_session() as session:
+        async with _get_async_session()() as session:
             result = await session.execute(
                 text("SELECT COUNT(*) FROM knowledge_documents")
             )
