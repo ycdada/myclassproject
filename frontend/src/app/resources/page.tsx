@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { resources } from "@/lib/api";
 import { MOCK_RESOURCES } from "@/lib/mockData";
+import Link from "next/link";
 
 const RESOURCE_TYPES = [
   { id: "all", label: "全部", icon: "📋" },
@@ -36,18 +37,6 @@ export default function ResourcesPage() {
     }
     fetchData();
   }, [activeType]);
-
-  const handleViewResource = (res: any) => {
-    // Show content in a simple alert for demo, or could navigate to detail page
-    if (res.content) {
-      const win = window.open("", "_blank", "width=800,height=600");
-      if (win) {
-        win.document.write(`<html><head><title>${res.title}</title>
-          <meta charset="utf-8"><style>body{font-family:sans-serif;max-width:720px;margin:2rem auto;padding:1rem;line-height:1.7;}pre{background:#f5f5f5;padding:1rem;border-radius:8px;overflow-x:auto;}code{font-size:0.9em;}</style></head>
-          <body>${res.content.replace(/\n/g, "<br>").replace(/\$\$(.*?)\$\$/g, "<em>$1</em>")}</body></html>`);
-      }
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -102,8 +91,8 @@ export default function ResourcesPage() {
       {!loading && !error && items.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((res: any) => (
-            <div key={res.id} onClick={() => handleViewResource(res)}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group">
+            <Link key={res.id} href={`/resources/${res.id}`}
+              className="block bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md hover:border-indigo-200 transition-all cursor-pointer group">
               <div className="flex items-start justify-between mb-3">
                 <span className={`px-2 py-1 rounded text-xs font-medium ${
                   res.resource_type === "lecture" ? "bg-blue-50 text-blue-600" :
@@ -131,7 +120,7 @@ export default function ResourcesPage() {
               {res.metadata?.estimated_time && (
                 <p className="text-xs text-gray-400 mt-3">⏱️ 预计学习: {res.metadata.estimated_time}</p>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       )}
