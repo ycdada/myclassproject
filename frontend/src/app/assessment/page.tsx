@@ -93,7 +93,7 @@ export default function AssessmentPage() {
                 {report.recommendations.map((rec: any, i: number) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-50 to-violet-50 border border-indigo-100">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white text-lg shrink-0 shadow-sm">
-                      {rec.action === "review" ? "◈" : "◎"}
+                      {rec.action === "review" ? "📖" : "✏️"}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-indigo-800">{rec.action === "review" ? "复习薄弱知识点" : "针对性练习"}</p>

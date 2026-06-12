@@ -64,7 +64,7 @@ export default function ResourceDetailPage() {
         <div className="flex items-center gap-3 mb-6">
           <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${tc.color}`}>{tc.label}</span>
           {resource.metadata?.difficulty && (
-            <span className="text-xs text-slate-300 font-medium">{"◇".repeat(resource.metadata.difficulty)}</span>
+            <span className="text-xs text-slate-300 font-medium">{"⭐".repeat(resource.metadata.difficulty)}</span>
           )}
           {resource.metadata?.estimated_time && (
             <span className="text-xs text-slate-300">{resource.metadata.estimated_time}</span>

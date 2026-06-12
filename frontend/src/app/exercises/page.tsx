@@ -74,11 +74,11 @@ export default function ExercisesPage() {
         <select value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}
           className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none shadow-sm">
           <option value="">全部难度</option>
-          <option value="1">◇ 基础</option>
-          <option value="2">◇◇ 入门</option>
-          <option value="3">◇◇◇ 进阶</option>
-          <option value="4">◇◇◇◇ 挑战</option>
-          <option value="5">◇◇◇◇◇ 竞赛</option>
+          <option value="1">⭐ 基础</option>
+          <option value="2">⭐⭐ 入门</option>
+          <option value="3">⭐⭐⭐ 进阶</option>
+          <option value="4">⭐⭐⭐⭐ 挑战</option>
+          <option value="5">⭐⭐⭐⭐⭐ 竞赛</option>
         </select>
       </div>
 
@@ -92,7 +92,7 @@ export default function ExercisesPage() {
               <div key={q.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-2.5 mb-4">
                   <span className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold tracking-wide border ${tc.color}`}>{tc.label}</span>
-                  <span className="text-[11px] text-slate-400 font-medium">{"◇".repeat(q.difficulty || 1)}</span>
+                  <span className="text-[11px] text-slate-400 font-medium">{"⭐".repeat(q.difficulty || 1)}</span>
                   <span className="text-[11px] text-slate-300">·</span>
                   <span className="text-[11px] text-slate-400">{q.topic || "数据结构"}</span>
                 </div>

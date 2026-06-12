@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "学习看板", icon: "◈" },
-  { href: "/chat", label: "AI 对话", icon: "◉" },
-  { href: "/resources", label: "学习资源", icon: "◧" },
-  { href: "/learning-path", label: "学习路径", icon: "◈" },
-  { href: "/exercises", label: "练习中心", icon: "◎" },
-  { href: "/assessment", label: "学习评估", icon: "◉" },
+  { href: "/", label: "学习看板", icon: "📊" },
+  { href: "/chat", label: "AI 对话", icon: "💬" },
+  { href: "/resources", label: "学习资源", icon: "📚" },
+  { href: "/learning-path", label: "学习路径", icon: "🗺️" },
+  { href: "/exercises", label: "练习中心", icon: "✏️" },
+  { href: "/assessment", label: "学习评估", icon: "📈" },
 ];
 
 export function NavBar() {

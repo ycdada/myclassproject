@@ -72,7 +72,7 @@ export default function LearningPathPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-2 flex items-center gap-3">
-                      <span>{"◇".repeat(topic.difficulty || 1)}</span>
+                      <span>{"⭐".repeat(topic.difficulty || 1)}</span>
                       <span>预计 {topic.estimated_hours || 2}h</span>
                     </p>
                     {topic.status === "available" || topic.status === "in_progress" ? (

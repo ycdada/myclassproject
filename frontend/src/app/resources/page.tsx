@@ -6,12 +6,12 @@ import { resources } from "@/lib/api";
 import { MOCK_RESOURCES } from "@/lib/mockData";
 
 const RESOURCE_TYPES = [
-  { id: "all", label: "全部", icon: "◆", gradient: "from-slate-500 to-slate-600" },
-  { id: "lecture", label: "课程讲义", icon: "◈", gradient: "from-blue-500 to-indigo-600" },
-  { id: "mindmap", label: "思维导图", icon: "◉", gradient: "from-violet-500 to-purple-600" },
-  { id: "exercise", label: "练习题", icon: "◆", gradient: "from-amber-500 to-orange-600" },
-  { id: "code", label: "代码案例", icon: "◎", gradient: "from-emerald-500 to-teal-600" },
-  { id: "reading", label: "拓展阅读", icon: "◈", gradient: "from-rose-500 to-pink-600" },
+  { id: "all", label: "全部", icon: "📋", gradient: "from-slate-500 to-slate-600" },
+  { id: "lecture", label: "课程讲义", icon: "📝", gradient: "from-blue-500 to-indigo-600" },
+  { id: "mindmap", label: "思维导图", icon: "🧠", gradient: "from-violet-500 to-purple-600" },
+  { id: "exercise", label: "练习题", icon: "✏️", gradient: "from-amber-500 to-orange-600" },
+  { id: "code", label: "代码案例", icon: "💻", gradient: "from-emerald-500 to-teal-600" },
+  { id: "reading", label: "拓展阅读", icon: "📖", gradient: "from-rose-500 to-pink-600" },
 ];
 
 export default function ResourcesPage() {
@@ -108,7 +108,7 @@ export default function ResourcesPage() {
                 </p>
                 {res.metadata?.difficulty && (
                   <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-50">
-                    <span className="text-[10px] text-slate-400">{"◇".repeat(res.metadata.difficulty)}{"◇".repeat(Math.max(0, 5 - res.metadata.difficulty)).replace(/◇/g, "◆")}</span>
+                    <span className="text-[10px] text-slate-400">{"⭐".repeat(res.metadata.difficulty)}{"☆".repeat(Math.max(0, 5 - res.metadata.difficulty))}</span>
                     <span className="text-[10px] text-slate-300">{res.metadata.estimated_time || "20 min"}</span>
                   </div>
                 )}

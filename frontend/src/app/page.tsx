@@ -5,17 +5,17 @@ import { assessment, learningPath } from "@/lib/api";
 import { MOCK_ASSESSMENT, MOCK_LEARNING_PATH } from "@/lib/mockData";
 
 const statDefs = [
-  { label: "已完成知识点", valueKey: "completed", totalKey: "total", icon: "◆", gradient: "from-indigo-500 to-blue-600", unit: "" },
-  { label: "已生成资源", valueKey: "resources", icon: "◇", gradient: "from-emerald-500 to-teal-600", unit: " 个" },
-  { label: "练习正确率", valueKey: "accuracy", icon: "◆", gradient: "from-amber-500 to-orange-600", unit: "%" },
-  { label: "学习时长", valueKey: "minutes", icon: "◇", gradient: "from-rose-500 to-pink-600", unit: " 分钟" },
+  { label: "已完成知识点", valueKey: "completed", totalKey: "total", icon: "📚", gradient: "from-indigo-500 to-blue-600", unit: "" },
+  { label: "已生成资源", valueKey: "resources", icon: "📄", gradient: "from-emerald-500 to-teal-600", unit: " 个" },
+  { label: "练习正确率", valueKey: "accuracy", icon: "✅", gradient: "from-amber-500 to-orange-600", unit: "%" },
+  { label: "学习时长", valueKey: "minutes", icon: "⏱️", gradient: "from-rose-500 to-pink-600", unit: " 分钟" },
 ];
 
 const quickLinks = [
-  { href: "/chat", title: "AI 学习画像", desc: "对话式构建你的专属学习画像", icon: "◉", gradient: "from-indigo-500 to-violet-500" },
-  { href: "/resources", title: "浏览资源库", desc: "个性化生成的讲义、习题与代码", icon: "◧", gradient: "from-emerald-500 to-teal-500" },
-  { href: "/exercises", title: "开始练习", desc: "多种题型智能匹配，巩固知识点", icon: "◎", gradient: "from-amber-500 to-orange-500" },
-  { href: "/assessment", title: "查看评估", desc: "多维度掌握度分析与学习建议", icon: "◉", gradient: "from-rose-500 to-pink-500" },
+  { href: "/chat", title: "AI 学习画像", desc: "对话式构建你的专属学习画像", icon: "💬", gradient: "from-indigo-500 to-violet-500" },
+  { href: "/resources", title: "浏览资源库", desc: "个性化生成的讲义、习题与代码", icon: "📚", gradient: "from-emerald-500 to-teal-500" },
+  { href: "/exercises", title: "开始练习", desc: "多种题型智能匹配，巩固知识点", icon: "✏️", gradient: "from-amber-500 to-orange-500" },
+  { href: "/assessment", title: "查看评估", desc: "多维度掌握度分析与学习建议", icon: "📈", gradient: "from-rose-500 to-pink-500" },
 ];
 
 export default function Home() {

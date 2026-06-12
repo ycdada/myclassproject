@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/ui/NavBar";
@@ -28,7 +29,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-slate-50">
-        <NavBar />
+        <Suspense fallback={<div className="h-16 bg-gradient-to-r from-indigo-950 via-indigo-900 to-violet-900" />}>
+          <NavBar />
+        </Suspense>
         <main className="flex-1 overflow-x-hidden">{children}</main>
         <footer className="border-t border-slate-100 bg-white/80 backdrop-blur-sm py-4 text-center text-xs text-slate-400 tracking-wide">
           DSALearn — 基于大模型的多智能体个性化学习系统 · 数据结构与算法
