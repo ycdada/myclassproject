@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { resources } from "@/lib/api";
 import { MOCK_RESOURCES } from "@/lib/mockData";
+import { useStudentStore } from "@/stores/useStudentStore";
 
 const RESOURCE_TYPES = [
   { id: "all", label: "全部", icon: "📋", gradient: "from-slate-500 to-slate-600" },
@@ -19,19 +20,30 @@ export default function ResourcesPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const sessionResources = useStudentStore((s) => s.sessionResources);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true); setError("");
       try {
         const data = await resources.list({ resource_type: activeType === "all" ? undefined : activeType });
-        setItems(data.resources.length ? data.resources : MOCK_RESOURCES);
+        const apiRes = data.resources.length ? data.resources : MOCK_RESOURCES;
+        // Merge session-generated resources
+        const sessionRes = sessionResources.filter((r) =>
+          activeType === "all" || r.resource_type === activeType
+        );
+        const merged = [...sessionRes, ...apiRes.filter((r: any) =>
+          !sessionRes.find((s) => s.id === r.id)
+        )];
+        setItems(merged);
       } catch {
-        setItems(MOCK_RESOURCES.filter((r) => activeType === "all" || r.resource_type === activeType));
+        const base = MOCK_RESOURCES.filter((r) => activeType === "all" || r.resource_type === activeType);
+        const sessionRes = sessionResources.filter((r) => activeType === "all" || r.resource_type === activeType);
+        setItems([...sessionRes, ...base.filter((r) => !sessionRes.find((s) => s.id === r.id))]);
       } finally { setLoading(false); }
     }
     fetchData();
-  }, [activeType]);
+  }, [activeType, sessionResources]);
 
   return (
     <div className="page-enter max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

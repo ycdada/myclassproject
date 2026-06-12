@@ -519,4 +519,49 @@ export function getMockChatScript() {
   return MOCK_CHAT_SCRIPTS;
 }
 
+// Mock session-generated resources (simulates multi-agent output)
+export function getMockSessionResources(topicId?: string) {
+  const prefix = topicId || "arrays";
+  return [
+    {
+      id: `res_${prefix}_lecture_demo`,
+      topic_id: topicId || "arrays",
+      resource_type: "lecture",
+      title: `学习讲义: ${topicId === "linked_lists" ? "链表" : topicId === "bst" ? "二叉搜索树" : topicId === "stacks" ? "栈与队列" : topicId === "dynamic_programming" ? "动态规划" : "数组"}`,
+      content: topicId === "linked_lists"
+        ? "# 链表 (Linked List)\n\n## 概念定义\n\n链表由一系列**节点**组成，每个节点包含数据和指向下一个节点的指针。节点在内存中不必连续。\n\n## 核心性质\n\n- 动态数据结构，无需预分配空间\n- 插入和删除在已知位置时仅需 $O(1)$\n- 不支持随机访问，查找需要 $O(n)$\n\n## 算法步骤\n\n### 反转链表\n\n\\`\\`\\`python\nclass ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef reverse_list(head):\n    prev = None\n    curr = head\n    while curr:\n        next_node = curr.next\n        curr.next = prev\n        prev = curr\n        curr = next_node\n    return prev\n\\`\\`\\`\n\n## 复杂度分析\n\n| 操作 | 时间复杂度 |\n|------|----------|\n| 按索引访问 | $O(n)$ |\n| 头部插入/删除 | $O(1)$ |\n| 中间插入/删除 | $O(n)$（需要先搜索）|\n\n## 常见误区\n\n- **误区**: 链表插入删除始终是 O(1)\n- **纠正**: 仅在已知节点位置时是 O(1)，需要先搜索到该位置则 O(n)"
+        : "# 数组 (Array)\n\n## 概念定义\n\n数组是一块**连续内存**中存储的相同类型元素集合。通过索引可以在 $O(1)$ 时间内访问任意元素。\n\n## 核心性质\n\n- 数组在内存中占据连续地址空间\n- 元素 `arr[i]` 的地址 = 基地址 + i × 元素大小\n- 支持**随机访问**\n\n## 算法步骤\n\n### 动态数组扩容\n\n\\`\\`\\`python\nclass DynamicArray:\n    def __init__(self):\n        self.capacity = 1\n        self.size = 0\n        self.data = [None] * self.capacity\n\n    def append(self, value):\n        if self.size == self.capacity:\n            self._resize(2 * self.capacity)\n        self.data[self.size] = value\n        self.size += 1\n\n    def _resize(self, new_capacity):\n        new_data = [None] * new_capacity\n        for i in range(self.size):\n            new_data[i] = self.data[i]\n        self.data = new_data\n        self.capacity = new_capacity\n\\`\\`\\`\n\n## 复杂度分析\n\n| 操作 | 时间复杂度 |\n|------|----------|\n| 按索引访问 | $O(1)$ |\n| 按值搜索 | $O(n)$ |\n| 末尾插入 (均摊) | $O(1)$ |\n| 中间插入 | $O(n)$ |\n\n## 常见误区\n\n- **误区**: 数组插入和删除总是 O(n)\n- **纠正**: 末尾插入在动态数组中均摊为 O(1)",
+    },
+    {
+      id: `res_${prefix}_mindmap_demo`,
+      topic_id: topicId || "arrays",
+      resource_type: "mindmap",
+      title: `思维导图: ${topicId === "linked_lists" ? "链表" : "数组"}`,
+      mindmap: `mindmap\n  root((${topicId === "linked_lists" ? "链表" : "数组"}))\n    基本概念\n      定义与特点\n      内存模型\n    核心操作\n      查找\n      插入\n      删除\n      遍历\n    进阶技术\n      快慢指针\n      反转链表\n      合并有序链表\n    应用场景\n      LRU缓存\n      多项式加法\n      图的邻接表`,
+    },
+    {
+      id: `res_${prefix}_exercise_demo`,
+      topic_id: topicId || "arrays",
+      resource_type: "exercise",
+      title: `练习题: ${topicId === "linked_lists" ? "链表" : "数组"} (5种题型)`,
+      questions: [
+        { question_type: "multiple_choice", difficulty: 1, question_text: topicId === "linked_lists" ? "链表不支持以下哪种操作？" : "数组的随机访问时间复杂度是多少？", options: [{ key: "A", value: "O(1)" }, { key: "B", value: "O(log n)" }, { key: "C", value: "O(n)" }, { key: "D", value: "O(n²)" }], hints: ["回顾数组的定义"] },
+        { question_type: "true_false", difficulty: 1, question_text: topicId === "linked_lists" ? "链表的插入和删除时间复杂度始终为 O(1)。" : "动态数组的尾插均摊复杂度为 O(1)。", hints: ["思考是否需要先定位"] },
+        { question_type: "coding", difficulty: 3, question_text: topicId === "linked_lists" ? "实现函数，检测单链表是否有环（快慢指针法）" : "实现一个动态数组类，支持 append 和自动扩容", hints: ["快指针每次2步，慢指针每次1步"] },
+      ],
+    },
+    {
+      id: `res_${prefix}_code_demo`,
+      topic_id: topicId || "arrays",
+      resource_type: "code",
+      title: `代码实操: ${topicId === "linked_lists" ? "链表操作" : "动态数组"}`,
+      solution: topicId === "linked_lists"
+        ? "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\n\ndef has_cycle(head):\n    slow = fast = head\n    while fast and fast.next:\n        slow = slow.next\n        fast = fast.next.next\n        if slow == fast:\n            return True\n    return False"
+        : "class DynamicArray:\n    def __init__(self):\n        self.capacity = 1\n        self.size = 0\n        self.data = [None] * self.capacity\n    def append(self, val):\n        if self.size == self.capacity:\n            self._resize(2 * self.capacity)\n        self.data[self.size] = val\n        self.size += 1",
+      test_cases: [{ input: "", expected: "" }],
+      verification: { passed: true },
+    },
+  ];
+}
+
 export { isDemoMode };

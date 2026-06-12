@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { resources } from "@/lib/api";
 import { MOCK_RESOURCES } from "@/lib/mockData";
+import { useStudentStore } from "@/stores/useStudentStore";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -13,15 +14,20 @@ export default function ResourceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [resource, setResource] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const sessionResources = useStudentStore((s) => s.sessionResources);
 
   useEffect(() => {
     async function f() {
+      // First check session-generated resources
+      const sessionRes = sessionResources.find((r) => r.id === id);
+      if (sessionRes) { setResource(sessionRes); setLoading(false); return; }
+      // Then try API, then MOCK
       try { const d = await resources.get(id as string); setResource(d); }
       catch { setResource(MOCK_RESOURCES.find((r) => r.id === id) || MOCK_RESOURCES[0]); }
       finally { setLoading(false); }
     }
     f();
-  }, [id]);
+  }, [id, sessionResources]);
 
   if (loading) {
     return (
@@ -46,7 +52,7 @@ export default function ResourceDetailPage() {
   }
 
   const isMindmap = resource.resource_type === "mindmap";
-  const content = resource.content || "";
+  const content = resource.content || resource.mindmap || "";
 
   const typeConfig: Record<string, { label: string; color: string }> = {
     lecture: { label: "课程讲义", color: "bg-blue-50 text-blue-700" },

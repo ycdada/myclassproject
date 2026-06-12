@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { assessment, learningPath } from "@/lib/api";
 import { MOCK_ASSESSMENT, MOCK_LEARNING_PATH } from "@/lib/mockData";
+import { useStudentStore } from "@/stores/useStudentStore";
 
 const statDefs = [
   { label: "已完成知识点", valueKey: "completed", totalKey: "total", icon: "📚", gradient: "from-indigo-500 to-blue-600", unit: "" },
@@ -37,10 +38,11 @@ export default function Home() {
     fetchData();
   }, []);
 
+  const sessionCount = useStudentStore((s) => s.sessionResources.length);
   const statValues = {
     completed: dashboard.topics_completed,
     total: dashboard.total_topics,
-    resources: dashboard.resources_generated || 4,
+    resources: (dashboard.resources_generated || 4) + sessionCount,
     accuracy: dashboard.exercises_attempted
       ? Math.round((dashboard.exercises_correct / dashboard.exercises_attempted) * 100) : "--",
     minutes: dashboard.total_study_time_minutes,
