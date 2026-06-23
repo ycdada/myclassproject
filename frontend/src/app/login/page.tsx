@@ -42,9 +42,7 @@ export default function LoginPage() {
     }
 
     try {
-      const API_BASE = (typeof window !== "undefined" && (window as any).__NEXT_DATA__)
-        ? "http://localhost:8000"
-        : "http://localhost:8000";
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
       const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
       const body: any = { username: form.username, password: form.password };

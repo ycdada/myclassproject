@@ -58,7 +58,8 @@ export default function ChatPage() {
 
   async function sendReal(msg: string) {
     try {
-      const res = await fetch("http://localhost:8000/api/chat/session", {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const res = await fetch(`${apiBase}/api/chat/session`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: msg, student_id: "demo" }),
