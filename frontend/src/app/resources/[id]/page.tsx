@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import { resources } from "@/lib/api";
 import { MOCK_RESOURCES } from "@/lib/mockData";
@@ -10,19 +9,28 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
+function getIdFromPath(): string {
+  if (typeof window === "undefined") return "";
+  const parts = window.location.pathname.split("/");
+  return parts[parts.length - 1] || "";
+}
+
 export default function ResourceDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const [id, setId] = useState("");
   const [resource, setResource] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const sessionResources = useStudentStore((s) => s.sessionResources);
 
   useEffect(() => {
+    setId(getIdFromPath());
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
     async function f() {
-      // First check session-generated resources
       const sessionRes = sessionResources.find((r) => r.id === id);
       if (sessionRes) { setResource(sessionRes); setLoading(false); return; }
-      // Then try API, then MOCK
-      try { const d = await resources.get(id as string); setResource(d); }
+      try { const d = await resources.get(id); setResource(d); }
       catch { setResource(MOCK_RESOURCES.find((r) => r.id === id) || MOCK_RESOURCES[0]); }
       finally { setLoading(false); }
     }
